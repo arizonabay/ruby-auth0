@@ -128,16 +128,20 @@ module Auth0
       # @param password [string] New user's password
       # @param connection_name [string] Database connection name
       # @return [json] Returns the created user
-      def signup(email, password, connection_name = UP_AUTH)
+      def signup(username, email, password, connection_name = UP_AUTH, given_name = '', family_name = '')
         raise Auth0::InvalidParameter, 'Must supply a valid email' if email.to_s.empty?
+        raise Auth0::InvalidParameter, 'Must supply a phonenumber' if username.to_s.empty?
         raise Auth0::InvalidParameter, 'Must supply a valid password' if password.to_s.empty?
-
         request_params = {
           email: email,
           password: password,
+          username: username,
           connection: connection_name,
           client_id: @client_id
         }
+        request_params.merge!({given_name: given_name}) unless given_name.blank?
+        request_params.merge!({family_name: family_name}) unless family_name.blank?
+        
         post('/dbconnections/signup', request_params)
       end
 
